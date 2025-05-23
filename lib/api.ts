@@ -48,12 +48,18 @@ export const fetchSMActivities = async (): Promise<SMActivity[]> => {
   }
 };
 
-export const createSMActivity = async (activity: Omit<SMActivity, 'id' | 'created_at' | 'updated_at'>): Promise<SMActivity> => {
+export const createSMActivity = async (activity: Omit<SMActivity, 'id' | 'created_at'>): Promise<SMActivity> => {
   const url = `${SUPABASE_URL}/rest/v1/sm_activities`;
+  
+  console.log('===== createSMActivity API 호출 시작 =====');
+  console.log('API 엔드포인트:', url);
+  console.log('요청 헤더:', getHeaders());
+  console.log('요청 바디:', JSON.stringify(activity, null, 2));
   
   logApiRequest('POST', url, activity);
   
   try {
+    console.log('fetch 호출 직전');
     const response = await fetch(url, {
       method: 'POST',
       headers: {
@@ -63,21 +69,35 @@ export const createSMActivity = async (activity: Omit<SMActivity, 'id' | 'create
       body: JSON.stringify(activity)
     });
     
+    console.log('fetch 응답 수신');
+    console.log('응답 상태:', response.status, response.statusText);
+    console.log('응답 헤더:', Object.fromEntries([...response.headers.entries()]));
+    
     const data = await response.json();
     logApiResponse('POST', url, data);
     
+    console.log('응답 데이터 파싱 완료:', JSON.stringify(data, null, 2));
+    
     if (!response.ok) {
+      console.error('API 오류 발생:', response.status, response.statusText);
+      console.error('오류 응답:', data);
       throw new Error(`API 오류: ${response.status} - ${JSON.stringify(data)}`);
     }
     
+    console.log('===== createSMActivity API 호출 완료 =====');
     return data[0];
   } catch (error) {
-    console.error('createSMActivity 오류:', error);
+    console.error('===== createSMActivity 오류 발생 =====');
+    console.error('오류 정보:', error);
+    if (error instanceof Error) {
+      console.error('오류 메시지:', error.message);
+      console.error('오류 스택:', error.stack);
+    }
     throw error;
   }
 };
 
-export const updateSMActivity = async (id: number, activity: Partial<SMActivity>): Promise<SMActivity> => {
+export const updateSMActivity = async (id: string, activity: Partial<SMActivity>): Promise<SMActivity> => {
   const url = `${SUPABASE_URL}/rest/v1/sm_activities?id=eq.${id}`;
   
   logApiRequest('PATCH', url, activity);
@@ -106,7 +126,7 @@ export const updateSMActivity = async (id: number, activity: Partial<SMActivity>
   }
 };
 
-export const deleteSMActivity = async (id: number): Promise<void> => {
+export const deleteSMActivity = async (id: string): Promise<void> => {
   const url = `${SUPABASE_URL}/rest/v1/sm_activities?id=eq.${id}`;
   
   logApiRequest('DELETE', url);

@@ -17,9 +17,10 @@ interface ExcelUploaderProps {
   type: 'sm-activity' | 'business-inquiry';
   onUpload: (data: DataRow[]) => Promise<void>;
   onComplete: () => void;
+  documentType?: 'dashboard' | 'plan';
 }
 
-export default function ExcelUploader({ type, onUpload, onComplete }: ExcelUploaderProps) {
+export default function ExcelUploader({ type, onUpload, onComplete, documentType = 'dashboard' }: ExcelUploaderProps) {
   const [previewData, setPreviewData] = useState<DataRow[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
@@ -47,9 +48,9 @@ export default function ExcelUploader({ type, onUpload, onComplete }: ExcelUploa
   };
 
   // 템플릿 다운로드 처리
-  const handleTemplateDownload = () => {
+  const handleDownloadTemplate = () => {
     if (type === 'sm-activity') {
-      downloadSMActivityTemplate();
+      downloadSMActivityTemplate(documentType);
     } else {
       downloadBusinessInquiryTemplate();
     }
@@ -117,7 +118,7 @@ export default function ExcelUploader({ type, onUpload, onComplete }: ExcelUploa
     <div className="space-y-4">
       <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
         <div>
-          <Button variant="outline" onClick={handleTemplateDownload}>
+          <Button variant="outline" onClick={handleDownloadTemplate}>
             샘플 템플릿 다운로드
           </Button>
         </div>

@@ -8,6 +8,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Textarea } from '@/components/ui/textarea';
 import Layout from '@/components/layout';
 import ExcelUploader from '@/components/excel-uploader';
 import { BusinessInquiry } from '@/types/database';
@@ -22,12 +24,16 @@ export default function InquiriesPage() {
   const [currentInquiry, setCurrentInquiry] = useState<Partial<BusinessInquiry> | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [isExcelDialogOpen, setIsExcelDialogOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'plan'>('dashboard');
   
   // 페이지네이션
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
-  const totalPages = Math.ceil(inquiries.length / itemsPerPage);
-  const currentInquiries = inquiries.slice(
+  
+  // 활성 탭에 따라 필터링된 문의 목록
+  const filteredInquiries = inquiries.filter(inquiry => inquiry.document_type === activeTab);
+  const totalPages = Math.ceil(filteredInquiries.length / itemsPerPage);
+  const currentInquiries = filteredInquiries.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
@@ -124,7 +130,7 @@ export default function InquiriesPage() {
 
   // 엑셀 파일 다운로드
   const handleExport = () => {
-    downloadBusinessInquiriesAsExcel(inquiries);
+    downloadBusinessInquiriesAsExcel(inquiries, activeTab);
   };
 
   // 엑셀 업로드 다이얼로그 열기
@@ -146,7 +152,7 @@ export default function InquiriesPage() {
   // 신규 생성 다이얼로그 열기
   const openCreateDialog = () => {
     setCurrentInquiry({
-      document_type: 'dashboard',
+      document_type: activeTab,
       inquiry_method: '',
       inquiry_type: '',
       department: '',
@@ -174,102 +180,18 @@ export default function InquiriesPage() {
           </div>
         </div>
 
-        {isLoading ? (
-          <div className="flex justify-center items-center h-64">
-            <p>로딩 중...</p>
-          </div>
-        ) : (
-          <>
-            <div className="border rounded-md overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>문서 유형</TableHead>
-                    <TableHead>문의방법</TableHead>
-                    <TableHead>문의유형</TableHead>
-                    <TableHead>요청부서</TableHead>
-                    <TableHead>문의사항</TableHead>
-                    <TableHead>요청자</TableHead>
-                    <TableHead>요청일</TableHead>
-                    <TableHead>답변일</TableHead>
-                    <TableHead>IT 담당자</TableHead>
-                    <TableHead>CNS 담당자</TableHead>
-                    <TableHead>개발자</TableHead>
-                    <TableHead>작업</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {currentInquiries.length > 0 ? (
-                    currentInquiries.map((inquiry) => (
-                      <TableRow key={inquiry.id}>
-                        <TableCell>
-                          {inquiry.document_type === 'dashboard' ? 'SM Activity - 대시보드' : 'SM Activity - Plan'}
-                        </TableCell>
-                        <TableCell>{inquiry.inquiry_method}</TableCell>
-                        <TableCell>{inquiry.inquiry_type}</TableCell>
-                        <TableCell>{inquiry.department}</TableCell>
-                        <TableCell>{inquiry.inquiry_content}</TableCell>
-                        <TableCell>{inquiry.requester}</TableCell>
-                        <TableCell>{new Date(inquiry.request_date).toLocaleDateString()}</TableCell>
-                        <TableCell>{new Date(inquiry.response_date).toLocaleDateString()}</TableCell>
-                        <TableCell>{inquiry.it_manager}</TableCell>
-                        <TableCell>{inquiry.cns_manager}</TableCell>
-                        <TableCell>{inquiry.developer}</TableCell>
-                        <TableCell>
-                          <div className="flex gap-2">
-                            <Button variant="outline" size="sm" onClick={() => handleEdit(inquiry)}>
-                              수정
-                            </Button>
-                            <Button variant="destructive" size="sm" onClick={() => handleDelete(inquiry.id)}>
-                              삭제
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  ) : (
-                    <TableRow>
-                      <TableCell colSpan={12} className="text-center py-4">
-                        데이터가 없습니다.
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </div>
-
-            {totalPages > 1 && (
-              <Pagination className="mt-4">
-                <PaginationContent>
-                  <PaginationItem>
-                    <PaginationPrevious 
-                      onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                      className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
-                    />
-                  </PaginationItem>
-                  
-                  {Array.from({ length: totalPages }).map((_, i) => (
-                    <PaginationItem key={i}>
-                      <PaginationLink
-                        onClick={() => setCurrentPage(i + 1)}
-                        isActive={currentPage === i + 1}
-                      >
-                        {i + 1}
-                      </PaginationLink>
-                    </PaginationItem>
-                  ))}
-                  
-                  <PaginationItem>
-                    <PaginationNext
-                      onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                      className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
-                    />
-                  </PaginationItem>
-                </PaginationContent>
-              </Pagination>
-            )}
-          </>
-        )}
+        <Tabs defaultValue="dashboard" value={activeTab} onValueChange={(value) => setActiveTab(value as 'dashboard' | 'plan')}>
+          <TabsList className="mb-4">
+            <TabsTrigger value="dashboard">대시보드</TabsTrigger>
+            <TabsTrigger value="plan">PLAN</TabsTrigger>
+          </TabsList>
+          <TabsContent value="dashboard">
+            {renderInquiriesTable()}
+          </TabsContent>
+          <TabsContent value="plan">
+            {renderInquiriesTable()}
+          </TabsContent>
+        </Tabs>
       </div>
 
       {/* 현업문의 등록/수정 다이얼로그 */}
@@ -284,7 +206,7 @@ export default function InquiriesPage() {
               <div className="space-y-2">
                 <Label htmlFor="document_type">문서 선택</Label>
                 <Select
-                  value={currentInquiry?.document_type || 'dashboard'}
+                  value={currentInquiry?.document_type || activeTab}
                   onValueChange={(value) => setCurrentInquiry(prev => ({ ...prev, document_type: value as 'dashboard' | 'plan' }))}
                 >
                   <SelectTrigger>
@@ -326,10 +248,12 @@ export default function InquiriesPage() {
 
               <div className="space-y-2 col-span-2">
                 <Label htmlFor="inquiry_content">문의사항</Label>
-                <Input
+                <Textarea
                   id="inquiry_content"
                   value={currentInquiry?.inquiry_content || ''}
-                  onChange={(e) => setCurrentInquiry(prev => ({ ...prev, inquiry_content: e.target.value }))}
+                  onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setCurrentInquiry(prev => ({ ...prev, inquiry_content: e.target.value }))}
+                  className="min-h-[100px]"
+                  placeholder="문의사항을 입력하세요"
                 />
               </div>
 
@@ -411,9 +335,110 @@ export default function InquiriesPage() {
               setIsExcelDialogOpen(false);
               loadInquiries();
             }}
+            documentType={activeTab}
           />
         </DialogContent>
       </Dialog>
     </Layout>
   );
+  
+  // 테이블 렌더링 함수
+  function renderInquiriesTable() {
+    if (isLoading) {
+      return (
+        <div className="flex justify-center items-center h-64">
+          <p>로딩 중...</p>
+        </div>
+      );
+    }
+
+    return (
+      <>
+        <div className="border rounded-md overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>문의방법</TableHead>
+                <TableHead>문의유형</TableHead>
+                <TableHead>요청부서</TableHead>
+                <TableHead>문의사항</TableHead>
+                <TableHead>요청자</TableHead>
+                <TableHead>요청일</TableHead>
+                <TableHead>답변일</TableHead>
+                <TableHead>IT 담당자</TableHead>
+                <TableHead>CNS 담당자</TableHead>
+                <TableHead>개발자</TableHead>
+                <TableHead>작업</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {currentInquiries.length > 0 ? (
+                currentInquiries.map((inquiry) => (
+                  <TableRow key={inquiry.id}>
+                    <TableCell>{inquiry.inquiry_method}</TableCell>
+                    <TableCell>{inquiry.inquiry_type}</TableCell>
+                    <TableCell>{inquiry.department}</TableCell>
+                    <TableCell>{inquiry.inquiry_content}</TableCell>
+                    <TableCell>{inquiry.requester}</TableCell>
+                    <TableCell>{new Date(inquiry.request_date).toLocaleDateString()}</TableCell>
+                    <TableCell>{new Date(inquiry.response_date).toLocaleDateString()}</TableCell>
+                    <TableCell>{inquiry.it_manager}</TableCell>
+                    <TableCell>{inquiry.cns_manager}</TableCell>
+                    <TableCell>{inquiry.developer}</TableCell>
+                    <TableCell>
+                      <div className="flex gap-2">
+                        <Button variant="outline" size="sm" onClick={() => handleEdit(inquiry)}>
+                          수정
+                        </Button>
+                        <Button variant="destructive" size="sm" onClick={() => handleDelete(inquiry.id)}>
+                          삭제
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={11} className="text-center py-4">
+                    데이터가 없습니다.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
+
+        {totalPages > 1 && (
+          <Pagination className="mt-4">
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious 
+                  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                  className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
+                />
+              </PaginationItem>
+              
+              {Array.from({ length: totalPages }).map((_, i) => (
+                <PaginationItem key={i}>
+                  <PaginationLink
+                    onClick={() => setCurrentPage(i + 1)}
+                    isActive={currentPage === i + 1}
+                  >
+                    {i + 1}
+                  </PaginationLink>
+                </PaginationItem>
+              ))}
+              
+              <PaginationItem>
+                <PaginationNext
+                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                  className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
+        )}
+      </>
+    );
+  }
 } 

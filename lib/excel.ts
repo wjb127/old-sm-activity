@@ -159,10 +159,49 @@ export const downloadSMActivitiesAsExcel = (activities: SMActivity[], documentTy
 };
 
 // 현업문의 데이터를 엑셀 파일로 변환하여 다운로드
-export const downloadBusinessInquiriesAsExcel = (inquiries: BusinessInquiry[], filename = 'business-inquiries.xlsx') => {
-  const worksheet = XLSX.utils.json_to_sheet(inquiries);
+export const downloadBusinessInquiriesAsExcel = (inquiries: BusinessInquiry[], documentType: 'dashboard' | 'plan' = 'dashboard', filename = 'business-inquiries.xlsx') => {
+  // 문의 필터링 (문서 유형에 따라)
+  const filteredInquiries = inquiries.filter(inquiry => inquiry.document_type === documentType);
+  
+  // 화면에 표시되는 형식으로 데이터 변환
+  const formattedData = filteredInquiries.map(inquiry => {
+    return {
+      '문의방법': inquiry.inquiry_method,
+      '문의유형': inquiry.inquiry_type,
+      '요청부서': inquiry.department,
+      '문의사항': inquiry.inquiry_content,
+      '요청자': inquiry.requester,
+      '요청일': new Date(inquiry.request_date).toLocaleDateString(),
+      '답변일': new Date(inquiry.response_date).toLocaleDateString(),
+      'IT 담당자': inquiry.it_manager,
+      'CNS 담당자': inquiry.cns_manager,
+      '개발자': inquiry.developer
+    };
+  });
+
+  const worksheet = XLSX.utils.json_to_sheet(formattedData);
   const workbook = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(workbook, worksheet, 'Business Inquiries');
+  
+  // 문서 유형에 따라 시트 이름 설정
+  const sheetName = documentType === 'dashboard' ? '현업문의 - 대시보드' : '현업문의 - PLAN';
+  XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
+  
+  // 열 너비 자동 조정
+  const columnWidths = [
+    { wch: 12 }, // 문의방법
+    { wch: 12 }, // 문의유형
+    { wch: 12 }, // 요청부서
+    { wch: 40 }, // 문의사항
+    { wch: 10 }, // 요청자
+    { wch: 12 }, // 요청일
+    { wch: 12 }, // 답변일
+    { wch: 10 }, // IT 담당자
+    { wch: 10 }, // CNS 담당자
+    { wch: 10 }  // 개발자
+  ];
+  
+  worksheet['!cols'] = columnWidths;
+  
   XLSX.writeFile(workbook, filename);
 };
 

@@ -18,9 +18,9 @@ export interface SMActivity {
 }
 
 export interface BusinessInquiry {
-  id: number;
+  id: string; // UUID 타입
   created_at: string;
-  updated_at: string;
+  number: number;
   document_type: 'dashboard' | 'plan'; // 문서 유형 (대시보드, Plan)
   inquiry_method: string; // 문의방법
   inquiry_type: string; // 문의유형
@@ -32,4 +32,5 @@ export interface BusinessInquiry {
   it_manager: string; // IT 담당자
   cns_manager: string; // CNS 담당자
   developer: string; // 개발자
+  month: string; // 월
 } 

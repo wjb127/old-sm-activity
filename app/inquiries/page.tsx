@@ -110,7 +110,7 @@ export default function InquiriesPage() {
   };
 
   // 삭제 처리
-  const handleDelete = async (id: number) => {
+  const handleDelete = async (id: string) => {
     if (window.confirm('정말로 이 문의를 삭제하시겠습니까?')) {
       try {
         await deleteBusinessInquiry(id);
@@ -151,6 +151,11 @@ export default function InquiriesPage() {
 
   // 신규 생성 다이얼로그 열기
   const openCreateDialog = () => {
+    const today = new Date().toISOString().split('T')[0];
+    const year = new Date().getFullYear();
+    const month = String(new Date().getMonth() + 1).padStart(2, '0');
+    const yearMonth = `${year}${month}`;
+    
     setCurrentInquiry({
       document_type: activeTab,
       inquiry_method: '',
@@ -158,11 +163,12 @@ export default function InquiriesPage() {
       department: '',
       inquiry_content: '',
       requester: '',
-      request_date: new Date().toISOString().split('T')[0],
-      response_date: new Date().toISOString().split('T')[0],
+      request_date: today,
+      response_date: today,
       it_manager: '한상욱',
       cns_manager: '이정인',
-      developer: '위승빈'
+      developer: '위승빈',
+      month: yearMonth
     });
     setIsEditing(false);
     setIsDialogOpen(true);

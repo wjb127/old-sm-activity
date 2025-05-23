@@ -176,7 +176,7 @@ export const fetchBusinessInquiries = async (): Promise<BusinessInquiry[]> => {
   }
 };
 
-export const createBusinessInquiry = async (inquiry: Omit<BusinessInquiry, 'id' | 'created_at' | 'updated_at'>): Promise<BusinessInquiry> => {
+export const createBusinessInquiry = async (inquiry: Omit<BusinessInquiry, 'id' | 'created_at'>): Promise<BusinessInquiry> => {
   const url = `${SUPABASE_URL}/rest/v1/business_inquiries`;
   
   logApiRequest('POST', url, inquiry);
@@ -205,7 +205,7 @@ export const createBusinessInquiry = async (inquiry: Omit<BusinessInquiry, 'id' 
   }
 };
 
-export const updateBusinessInquiry = async (id: number, inquiry: Partial<BusinessInquiry>): Promise<BusinessInquiry> => {
+export const updateBusinessInquiry = async (id: string, inquiry: Partial<BusinessInquiry>): Promise<BusinessInquiry> => {
   const url = `${SUPABASE_URL}/rest/v1/business_inquiries?id=eq.${id}`;
   
   logApiRequest('PATCH', url, inquiry);
@@ -234,7 +234,7 @@ export const updateBusinessInquiry = async (id: number, inquiry: Partial<Busines
   }
 };
 
-export const deleteBusinessInquiry = async (id: number): Promise<void> => {
+export const deleteBusinessInquiry = async (id: string): Promise<void> => {
   const url = `${SUPABASE_URL}/rest/v1/business_inquiries?id=eq.${id}`;
   
   logApiRequest('DELETE', url);

@@ -1,34 +1,15 @@
 'use client';
 
 import React from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { usePathname, useRouter } from 'next/navigation';
 
 interface LayoutProps {
   children: React.ReactNode;
-  smActivitiesContent?: React.ReactNode;
-  inquiriesContent?: React.ReactNode;
 }
 
-const Layout: React.FC<LayoutProps> = ({
-  children,
-  smActivitiesContent,
-  inquiriesContent
-}) => {
+const Layout: React.FC<LayoutProps> = ({ children }) => {
   const router = useRouter();
   const pathname = usePathname();
-  const activeTab = pathname === '/inquiries' ? 'inquiries' : 'sm-activities';
-
-  // 탭 기능이 필요한 경우에만 탭을 표시
-  const showTabs = smActivitiesContent && inquiriesContent;
-
-  const handleTabChange = (value: string) => {
-    if (value === 'inquiries') {
-      router.push('/inquiries');
-    } else {
-      router.push('/sm-activities');
-    }
-  };
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
@@ -37,6 +18,28 @@ const Layout: React.FC<LayoutProps> = ({
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex justify-between items-center">
             <h1 className="text-xl font-bold text-gray-800">SM Activity 관리 시스템</h1>
+            <nav className="flex space-x-4">
+              <button
+                onClick={() => router.push('/sm-activities')}
+                className={`px-3 py-2 rounded-md text-sm font-medium ${
+                  pathname === '/sm-activities'
+                    ? 'bg-blue-100 text-blue-700'
+                    : 'text-gray-600 hover:bg-gray-100'
+                }`}
+              >
+                SM Activity
+              </button>
+              <button
+                onClick={() => router.push('/inquiries')}
+                className={`px-3 py-2 rounded-md text-sm font-medium ${
+                  pathname === '/inquiries'
+                    ? 'bg-blue-100 text-blue-700'
+                    : 'text-gray-600 hover:bg-gray-100'
+                }`}
+              >
+                현업문의
+              </button>
+            </nav>
           </div>
         </div>
       </header>
@@ -44,22 +47,7 @@ const Layout: React.FC<LayoutProps> = ({
       {/* 메인 콘텐츠 */}
       <main className="flex-1">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          {showTabs ? (
-            <Tabs defaultValue={activeTab} onValueChange={handleTabChange} className="w-full">
-              <TabsList className="grid w-full grid-cols-2 mb-8">
-                <TabsTrigger value="sm-activities">SM Activity</TabsTrigger>
-                <TabsTrigger value="inquiries">현업문의</TabsTrigger>
-              </TabsList>
-              <TabsContent value="sm-activities" className="mt-0">
-                {smActivitiesContent}
-              </TabsContent>
-              <TabsContent value="inquiries" className="mt-0">
-                {inquiriesContent}
-              </TabsContent>
-            </Tabs>
-          ) : (
-            children
-          )}
+          {children}
         </div>
       </main>
     </div>

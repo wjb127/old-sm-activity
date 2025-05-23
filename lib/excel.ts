@@ -3,7 +3,7 @@ import { SMActivity, BusinessInquiry } from '@/types/database';
 
 interface SMActivityRow {
   document_type?: 'dashboard' | 'plan';
-  task_type?: 'regular' | 'irregular';
+  activity_type?: 'regular' | 'irregular';
   work_type?: string;
   title?: string;
   requester?: string;
@@ -43,7 +43,7 @@ export const parseSMActivitiesFromExcel = (file: File): Promise<Omit<SMActivity,
 
         const activities = jsonData.map((row: SMActivityRow) => ({
           document_type: (row.document_type as 'dashboard' | 'plan') || 'dashboard',
-          task_type: (row.task_type as 'regular' | 'irregular') || 'regular',
+          activity_type: (row.activity_type as 'regular' | 'irregular') || 'regular',
           work_type: row.work_type || '',
           title: row.title || '',
           requester: row.requester || '',
@@ -122,7 +122,7 @@ export const downloadSMActivityTemplate = (filename = 'sm-activity-template.xlsx
   const template: Partial<SMActivity>[] = [
     {
       document_type: 'dashboard',
-      task_type: 'regular',
+      activity_type: 'regular',
       work_type: '예시: 대시보드 업데이트',
       title: '예시: 월간 대시보드 업데이트',
       requester: '예시: 홍길동',

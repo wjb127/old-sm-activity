@@ -3,7 +3,7 @@ export interface SMActivity {
   created_at: string;
   updated_at: string;
   document_type: 'dashboard' | 'plan'; // 문서 유형 (대시보드, Plan)
-  task_type: 'regular' | 'irregular'; // 구분 (정기/비정기)
+  activity_type: 'regular' | 'irregular'; // 구분 (정기/비정기)
   work_type: string; // 작업유형
   title: string; // TASK 제목
   requester: string; // 요청자

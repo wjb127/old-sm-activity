@@ -147,7 +147,7 @@ export default function SMActivitiesPage() {
   const openCreateDialog = () => {
     setCurrentActivity({
       document_type: 'dashboard',
-      task_type: 'regular',
+      activity_type: 'regular',
       work_type: '',
       title: '',
       requester: '',
@@ -206,7 +206,7 @@ export default function SMActivitiesPage() {
                           {activity.document_type === 'dashboard' ? 'SM Activity - 대시보드' : 'SM Activity - Plan'}
                         </TableCell>
                         <TableCell>
-                          {activity.task_type === 'regular' ? '정기' : '비정기'}
+                          {activity.activity_type === 'regular' ? '정기' : '비정기'}
                         </TableCell>
                         <TableCell>{activity.work_type}</TableCell>
                         <TableCell>{activity.title}</TableCell>
@@ -300,10 +300,10 @@ export default function SMActivitiesPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="task_type">구분</Label>
+                <Label htmlFor="activity_type">구분</Label>
                 <Select
-                  value={currentActivity?.task_type || 'regular'}
-                  onValueChange={(value) => setCurrentActivity(prev => ({ ...prev, task_type: value as 'regular' | 'irregular' }))}
+                  value={currentActivity?.activity_type || 'regular'}
+                  onValueChange={(value) => setCurrentActivity(prev => ({ ...prev, activity_type: value as 'regular' | 'irregular' }))}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="구분 선택" />

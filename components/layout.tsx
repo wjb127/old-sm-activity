@@ -50,6 +50,15 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           {children}
         </div>
       </main>
+
+      {/* 푸터 */}
+      <footer className="bg-white border-t">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <p className="text-sm text-gray-500 text-center">
+            © {new Date().getFullYear()} SM Activity 관리 시스템
+          </p>
+        </div>
+      </footer>
     </div>
   );
 };

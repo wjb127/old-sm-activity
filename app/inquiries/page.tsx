@@ -74,15 +74,32 @@ export default function InquiriesPage() {
     if (!currentInquiry) return;
     
     try {
+      console.log('현업문의 저장 시작:', currentInquiry);
+      
       if (isEditing && currentInquiry.id) {
-        await updateBusinessInquiry(currentInquiry.id, currentInquiry);
+        console.log(`ID ${currentInquiry.id}의 현업문의 수정 시도`);
+        const result = await updateBusinessInquiry(currentInquiry.id, currentInquiry);
+        console.log('현업문의 수정 결과:', result);
       } else {
-        await createBusinessInquiry(currentInquiry as Omit<BusinessInquiry, 'id' | 'created_at' | 'updated_at'>);
+        console.log('새 현업문의 생성 시도');
+        const result = await createBusinessInquiry(currentInquiry as Omit<BusinessInquiry, 'id' | 'created_at' | 'updated_at'>);
+        console.log('현업문의 생성 결과:', result);
       }
+      
       setIsDialogOpen(false);
       loadInquiries();
     } catch (error) {
       console.error('현업문의 저장 중 오류 발생:', error);
+      
+      // 오류 상세 정보 출력
+      if (error instanceof Error) {
+        console.error('오류 메시지:', error.message);
+        console.error('오류 스택:', error.stack);
+      } else {
+        console.error('알 수 없는 오류 타입:', typeof error);
+      }
+      
+      alert(`저장 중 오류가 발생했습니다: ${error instanceof Error ? error.message : '알 수 없는 오류'}`);
     }
   };
 

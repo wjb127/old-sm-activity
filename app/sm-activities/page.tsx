@@ -74,15 +74,32 @@ export default function SMActivitiesPage() {
     if (!currentActivity) return;
     
     try {
+      console.log('SM Activity 저장 시작:', currentActivity);
+      
       if (isEditing && currentActivity.id) {
-        await updateSMActivity(currentActivity.id, currentActivity);
+        console.log(`ID ${currentActivity.id}의 SM Activity 수정 시도`);
+        const result = await updateSMActivity(currentActivity.id, currentActivity);
+        console.log('SM Activity 수정 결과:', result);
       } else {
-        await createSMActivity(currentActivity as Omit<SMActivity, 'id' | 'created_at' | 'updated_at'>);
+        console.log('새 SM Activity 생성 시도');
+        const result = await createSMActivity(currentActivity as Omit<SMActivity, 'id' | 'created_at' | 'updated_at'>);
+        console.log('SM Activity 생성 결과:', result);
       }
+      
       setIsDialogOpen(false);
       loadActivities();
     } catch (error) {
       console.error('SM Activity 저장 중 오류 발생:', error);
+      
+      // 오류 상세 정보 출력
+      if (error instanceof Error) {
+        console.error('오류 메시지:', error.message);
+        console.error('오류 스택:', error.stack);
+      } else {
+        console.error('알 수 없는 오류 타입:', typeof error);
+      }
+      
+      alert(`저장 중 오류가 발생했습니다: ${error instanceof Error ? error.message : '알 수 없는 오류'}`);
     }
   };
 

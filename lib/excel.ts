@@ -99,7 +99,7 @@ export const parseBusinessInquiriesFromExcel = (file: File): Promise<Omit<Busine
           request_date: row.request_date || new Date().toISOString().split('T')[0],
           response_date: row.response_date || new Date().toISOString().split('T')[0],
           it_manager: row.it_manager || '한상욱',
-          cns_manager: row.cns_manager || '이정인',
+          cns_manager: row.cns_manager || '한상명',
           developer: row.developer || '위승빈',
           month: row.month || yearMonth,
           number: row.number || index + 1
@@ -287,7 +287,7 @@ export const downloadBusinessInquiryTemplate = (filename = 'business-inquiry-tem
       request_date: today,
       response_date: today,
       it_manager: '한상욱',
-      cns_manager: '이정인',
+      cns_manager: '한상명',
       developer: '위승빈',
       month: yearMonth,
       number: 1

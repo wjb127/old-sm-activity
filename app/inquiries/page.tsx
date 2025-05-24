@@ -166,7 +166,7 @@ export default function InquiriesPage() {
       request_date: today,
       response_date: today,
       it_manager: '한상욱',
-      cns_manager: '이정인',
+      cns_manager: '한상명',
       developer: '위승빈',
       month: yearMonth
     });
@@ -305,7 +305,7 @@ export default function InquiriesPage() {
                 <Label htmlFor="cns_manager">CNS 담당자</Label>
                 <Input
                   id="cns_manager"
-                  value={currentInquiry?.cns_manager || '이정인'}
+                  value={currentInquiry?.cns_manager || '한상명'}
                   onChange={(e) => setCurrentInquiry(prev => ({ ...prev, cns_manager: e.target.value }))}
                 />
               </div>

@@ -29,6 +29,8 @@ interface BusinessInquiryRow {
   it_manager?: string;
   cns_manager?: string;
   developer?: string;
+  month?: string;
+  number?: number;
 }
 
 // 엑셀 파일에서 SM Activity 데이터 추출
@@ -70,7 +72,7 @@ export const parseSMActivitiesFromExcel = (file: File): Promise<Omit<SMActivity,
 };
 
 // 엑셀 파일에서 현업문의 데이터 추출
-export const parseBusinessInquiriesFromExcel = (file: File): Promise<Omit<BusinessInquiry, 'id' | 'created_at' | 'updated_at'>[]> => {
+export const parseBusinessInquiriesFromExcel = (file: File): Promise<Omit<BusinessInquiry, 'id' | 'created_at'>[]> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = (e) => {
@@ -81,7 +83,13 @@ export const parseBusinessInquiriesFromExcel = (file: File): Promise<Omit<Busine
         const worksheet = workbook.Sheets[sheetName];
         const jsonData = XLSX.utils.sheet_to_json(worksheet) as BusinessInquiryRow[];
 
-        const inquiries = jsonData.map((row: BusinessInquiryRow) => ({
+        // 현재 날짜 정보로 month 생성
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, '0');
+        const yearMonth = `${year}${month}`;
+
+        const inquiries = jsonData.map((row: BusinessInquiryRow, index) => ({
           document_type: (row.document_type as 'dashboard' | 'plan') || 'dashboard',
           inquiry_method: row.inquiry_method || '',
           inquiry_type: row.inquiry_type || '',
@@ -93,6 +101,8 @@ export const parseBusinessInquiriesFromExcel = (file: File): Promise<Omit<Busine
           it_manager: row.it_manager || '한상욱',
           cns_manager: row.cns_manager || '이정인',
           developer: row.developer || '위승빈',
+          month: row.month || yearMonth,
+          number: row.number || index + 1
         }));
 
         resolve(inquiries);
@@ -261,6 +271,11 @@ export const downloadSMActivityTemplate = (documentType: 'dashboard' | 'plan' = 
 
 // 현업문의 샘플 템플릿 다운로드
 export const downloadBusinessInquiryTemplate = (filename = 'business-inquiry-template.xlsx') => {
+  const today = new Date().toISOString().split('T')[0];
+  const year = new Date().getFullYear();
+  const month = String(new Date().getMonth() + 1).padStart(2, '0');
+  const yearMonth = `${year}${month}`;
+  
   const template: Partial<BusinessInquiry>[] = [
     {
       document_type: 'dashboard',
@@ -269,11 +284,13 @@ export const downloadBusinessInquiryTemplate = (filename = 'business-inquiry-tem
       department: '예시: 마케팅팀',
       inquiry_content: '예시: 대시보드 접근 권한 요청',
       requester: '예시: 홍길동',
-      request_date: new Date().toISOString().split('T')[0],
-      response_date: new Date().toISOString().split('T')[0],
+      request_date: today,
+      response_date: today,
       it_manager: '한상욱',
       cns_manager: '이정인',
-      developer: '위승빈'
+      developer: '위승빈',
+      month: yearMonth,
+      number: 1
     }
   ];
 

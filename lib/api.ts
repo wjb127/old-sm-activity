@@ -24,7 +24,7 @@ const logApiResponse = (method: string, url: string, response: unknown) => {
 
 // SM Activity 관련 API 함수
 export const fetchSMActivities = async (): Promise<SMActivity[]> => {
-  const url = `${SUPABASE_URL}/rest/v1/sm_activities?order=request_date.desc&select=*`;
+  const url = `${SUPABASE_URL}/rest/v1/sm_activities?order=request_date.asc,created_at.asc&select=*`;
   
   logApiRequest('GET', url);
   
